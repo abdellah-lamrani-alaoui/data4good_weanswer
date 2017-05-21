@@ -15,28 +15,73 @@ score = {"a": 1, "c": 3, "b": 3, "e": 1, "d": 2, "g": 2,
          "x": 8, "z": 10}
 
 
-def scrabble_score(word):
+def scrabble_score(word, score):
 	"""
-	Function that outputs the score of a word (sum of the scores of each letter)
+	Function that outputs the score of a word (sum of the scores of each letter).
 	
 	Parameters
 	----------
-	word : string. (the word in question)
+	word  : string. The word in question.
+	score : dic. The dictionnary that contains the score per letter. 
 	
 	Returns
 	-------
-	score_tot : int. (the score for the word)
+	score_tot : int. The score for the word.
 	"""	
 	
 	total = []
 	for letter in word:
-		total.append(score[letter.lower()])
+		# Checking if the letter is taken into account for the scrabble score
+		if letter.lower() in score.keys():
+			total.append(score[letter.lower()])
 	score_tot = sum(total)
 	return score_tot
 	
-#def extract_key_words(sentence, n = 3):
-	# TO DO : Extract the n most relevant key words according to the score
-	#         ? what about removing the stop words from nltk stopwords ?
+def extract_key_words(sentence, score_function, n , *args):
+	""" 
+	Function that extracts the most relevant key words according to the scrabble_score.
 	
+	Parameters
+	----------
+	sentence       : string. In our case the question from which we want to extract the key words.
+	score_function : function. Function that computes the score fiven a word.
+	*args          : arguments of the function. 
+	n              : int. The number of keywords we want to extract (descending order).
+	
+	Returns
+	-------
+	keywords : list of strings. The list of the n most relevant kewords according the the score.
+	"""
+	
+	words = sentence.split(" ")
+	scores_words = {}
+	for word in words :
+		scores_words[word] = score_function(word, *args)
+	keywords = sorted(scores_words, key = scores_words.get)[-n - 1 :][-1:0:-1]
+	return keywords
+	
+
+import unittest 
+
+import unittest
+
+class TestFunctions(unittest.TestCase):
+
+	def test_scrabble_score(self):
+		self.assertEqual(scrabble_score("abdel", score), 8)
+		self.assertEqual(scrabble_score("ABDel", score), 8)
+		self.assertEqual(scrabble_score("ABD12 el", score), 8)
+		self.assertEqual(scrabble_score("test", score), 4)
+		self.assertEqual(scrabble_score("we", score), 5)
+		self.assertEqual(scrabble_score("answer", score), 9)
+		self.assertEqual(scrabble_score("aa", score), 2)
+		
+	def test_extract_key_words(self):
+		self.assertEqual(extract_key_words("we answer test aa", scrabble_score, 3, score), ["answer", "we", "test"])
+		self.assertEqual(extract_key_words("we answer test aa", scrabble_score, 2, score), ["answer", "we"])
+	
+if __name__ == '__main__':
+    unittest.main()
 				
-print scrabble_score("Helix")
+
+
