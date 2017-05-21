@@ -5,6 +5,11 @@ Created on Sat May 20 23:39:03 2017
 @author: Abdellah
 """
 
+import nltk
+import re
+
+from nltk import word_tokenize as wt
+from nltk.corpus import stopwords
 
 # Defining the scores for each letter
 
@@ -39,38 +44,31 @@ def scrabble_score(word, score):
 	
 def extract_key_words(sentence, score_function, n , *args):
 	""" 
-	Function that extracts the most relevant key words according to the scrabble_score.
+	Function that extracts the most relevant keywords according to the scrabble_score.
 	
 	Parameters
 	----------
-	sentence       : string. In our case the question from which we want to extract the key words.
-	score_function : function. Function that computes the score fiven a word.
+	sentence       : string. In our case the question from which we want to extract the keywords.
+	score_function : function. Function that computes the score given a word.
 	*args          : arguments of the function. 
 	n              : int. The number of keywords we want to extract (descending order).
 	
 	Returns
 	-------
-	keywords : list of strings. The list of the n most relevant kewords according the the score.
+	keywords : list of strings. The list of the n most relevant keywords according the the score.
 	"""
 	
-	words = sentence.split(" ")
+	words = wt(sentence)
 	scores_words = {}
 	for word in words :
 		scores_words[word] = score_function(word, *args)
-	keywords = sorted(scores_words, key = scores_words.get)[-n - 1 :][-1:0:-1]
+	keywords = sorted(scores_words, key = scores_words.get, reverse = True)[:n]
 	return keywords
-	
-	
-# importing the key words
-from nltk.corpus import stopwords
 
 	
-def extract_key_words_stowords(sentence):
-	
-	# To do : still needs to preprocess according to the punctuation
-	
+def clean_tokenize(sentence):	
 	"""
-	Returns all the words that are not stop words.
+	Tokenize a sentence (after removing stopwords and punctuation).
 	
 	Parameters
 	----------
@@ -82,7 +80,9 @@ def extract_key_words_stowords(sentence):
 	"""	
 	
 	stop = set(stopwords.words("english"))
-	keywords = [word.lower() for word in sentence.split(" ") if word.lower() not in stop]
+	keywords = [word.lower() for word in 
+	            wt(re.sub("[^a-zA-Z]", " ", sentence)) 
+	            if word.lower() not in stop]
 	
 	return keywords
 	
@@ -108,8 +108,8 @@ class TestFunctions(unittest.TestCase):
 		self.assertEqual(extract_key_words("we answer test aa", scrabble_score, 3, score), ["answer", "we", "test"])
 		self.assertEqual(extract_key_words("we answer test aa", scrabble_score, 2, score), ["answer", "we"])
 	
-	def test_extract_key_words_stowords(self):
-		self.assertEqual(extract_key_words_stowords("What are these questions"), ["questions"])
+	def test_clean_tokenize(self):
+		self.assertEqual(clean_tokenize("What are these questions"), ["questions"])
 if __name__ == '__main__':
     unittest.main()
 				
