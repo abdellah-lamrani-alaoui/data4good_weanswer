@@ -60,6 +60,34 @@ def extract_key_words(sentence, score_function, n , *args):
 	keywords = sorted(scores_words, key = scores_words.get)[-n - 1 :][-1:0:-1]
 	return keywords
 	
+	
+# importing the key words
+from nltk.corpus import stopwords
+
+	
+def extract_key_words_stowords(sentence):
+	
+	# To do : still needs to preprocess according to the punctuation
+	
+	"""
+	Returns all the words that are not stop words.
+	
+	Parameters
+	----------
+	sentence : string. The sentence from which we want to extract the keywords.
+	
+	Returns
+	-------
+	keywords : list of strings. The list of the non stop words.
+	"""	
+	
+	stop = set(stopwords.words("english"))
+	keywords = [word.lower() for word in sentence.split(" ") if word.lower() not in stop]
+	
+	return keywords
+	
+
+# TO DO : Do the intersection between the two extraction methods
 
 import unittest 
 
@@ -80,6 +108,8 @@ class TestFunctions(unittest.TestCase):
 		self.assertEqual(extract_key_words("we answer test aa", scrabble_score, 3, score), ["answer", "we", "test"])
 		self.assertEqual(extract_key_words("we answer test aa", scrabble_score, 2, score), ["answer", "we"])
 	
+	def test_extract_key_words_stowords(self):
+		self.assertEqual(extract_key_words_stowords("What are these questions"), ["questions"])
 if __name__ == '__main__':
     unittest.main()
 				
