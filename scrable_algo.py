@@ -115,3 +115,6 @@ if __name__ == '__main__':
 				
 
 
+
+test = {"food" : {"buger" : {"a" : 0.5, "b" : 0.8}, "tomato" : {"a" : 0.4}}, \
+	"advice" : {"consultant" : {"a" : 0.3, "b" : 0.9}, "help" : {"a" : 0.1}} }
